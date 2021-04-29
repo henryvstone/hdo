@@ -1,0 +1,74 @@
+#!/usr/bin/python
+
+# do a "Task Name" ["Description of the task"]
+# do l [n tasks]
+# do
+# do p
+# do d
+
+import sys
+import os
+from os import path
+
+config_dir = path.join(os.environ['HOME'], '.config', 'hdo')
+if not path.exists(config_dir):
+    os.makedirs(config_dir, exist_ok=True)
+
+config_file = path.join(config_dir, 'todo.txt')
+
+
+def read_todos():
+    if path.exists(config_file):
+        with open(config_file, 'r') as todo_file:
+            return [x.replace('\n', '') for x in todo_file.readlines()]
+    else:
+        return []
+
+
+def save_todos():
+    with open(config_file, 'w') as todo_file:
+        for todo in todos:
+            todo_file.write(todo)
+            todo_file.write('\n')
+        todo_file.flush()
+
+
+todos = read_todos()
+
+
+def print_next_do():
+    if len(todos) == 0:
+        print("DO: Empty plate! Find a task to do")
+    else:
+        print(f"DO: {todos[0]}")
+
+
+if __name__ == '__main__':
+    if len(sys.argv) == 1:
+        print_next_do()
+
+    if len(sys.argv) >= 2:
+        if sys.argv[1] == 'd' or sys.argv[1] == 'delete' or sys.argv[1] == 'done':
+            if len(todos) > 0:
+                finished = todos.pop(0)
+                print(f"DONE: {finished}")
+            print_next_do()
+            save_todos()
+        if sys.argv[1] == 'p' or sys.argv[1] == 'push' or sys.argv[1] == 'delay':
+            if len(todos) > 0:
+                finished = todos.pop(0)
+                todos.append(finished)
+                save_todos()
+                print(f"PUSH: {finished}")
+            else:
+                print(f"PUSH: NO TASK")
+        if sys.argv[1] == 'a' or sys.argv[1] == 'add':
+            if len(sys.argv) == 3:
+                task = sys.argv[2]
+                todos.append(task)
+                print(todos)
+                save_todos()
+            else:
+                print("Please give your task a name")
+
+
